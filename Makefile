@@ -8,23 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openssl
-PKG_VERSION:=3.4.0
+PKG_VERSION:=3.3.0
 PKG_RELEASE:=1
 PKG_BUILD_FLAGS:=no-mips16 gc-sections
 
 PKG_BUILD_PARALLEL:=1
 
-PKG_BASE:=$(subst $(space),.,$(wordlist 1,2,$(subst .,$(space),$(PKG_VERSION))))
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:= \
-	http://www.openssl.org/source/ \
-	http://www.openssl.org/source/old/$(PKG_BASE)/ \
-	http://ftp.fi.muni.cz/pub/openssl/source/ \
-	http://ftp.fi.muni.cz/pub/openssl/source/old/$(PKG_BASE)/ \
-	ftp://ftp.pca.dfn.de/pub/tools/net/openssl/source/ \
-	ftp://ftp.pca.dfn.de/pub/tools/net/openssl/source/old/$(PKG_BASE)/
-
-PKG_HASH:=e15dda82fe2fe8139dc2ac21a36d4ca01d5313c75f99f46c4e8a27709b7294bf
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/quictls/openssl.git
+PKG_SOURCE_VERSION:=96b7f14fa936d1b8c43c4003f09ef9ded4c4bc93
+PKG_MIRROR_HASH:=91bc41b1d1bdd31c58e5a13ed231224dac778df5927ddf1a6d4ae8afbf511337
 
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
@@ -289,7 +283,7 @@ ifdef CONFIG_OPENSSL_NO_DEPRECATED
 endif
 
 ifeq ($(CONFIG_OPENSSL_OPTIMIZE_SPEED),y)
-  TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS)) -Ofast
+  TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS)) -O3
 endif
 
 ifeq ($(CONFIG_OPENSSL_SMALL_FOOTPRINT),y)
@@ -374,7 +368,7 @@ define Build/Configure
 	)
 endef
 
-TARGET_CFLAGS += $(FPIC) -ffat-lto-objects
+TARGET_CFLAGS += $(FPIC)
 
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
